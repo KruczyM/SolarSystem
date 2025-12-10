@@ -17,7 +17,7 @@ let camera = new THREE.PerspectiveCamera(
     0.1,
     2000
 );
-const backgroundMusic = setupAudio(camera, '/assets/music/space.mp3');
+const backgroundMusic = setupAudio(camera, '/SolarSystem/assets/music/space.mp3');
 camera.position.set(10, 12, 48);
 camera.lookAt(0, 0, 0)
 scene.add(camera);

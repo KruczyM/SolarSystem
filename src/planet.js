@@ -146,7 +146,7 @@ export const solarSystemData = [
         name: "Sun",
         radius: 5,
         color: "#ffffff",
-        textureUrl: "/assets/textures/sun.png",
+        textureUrl: "/SolarSystem/assets/textures/sun.png",
         orbitalRadius: 0,
         orbitalSpeed: 0,
         rotationSpeed: (2 * Math.PI) / (36), // 0.15
@@ -160,7 +160,7 @@ export const solarSystemData = [
         name: "Mercury",
         radius: 0.35,
         color: "#b1b1b1",
-        textureUrl: "/assets/textures/mercury.webp",
+        textureUrl: "/SolarSystem/assets/textures/mercury.webp",
         orbitalRadius: 8,
         orbitalSpeed: (2 * Math.PI) / (88),      // 0.713
         rotationSpeed: (2 * Math.PI) / (58.6),  // 1.072
@@ -174,7 +174,7 @@ export const solarSystemData = [
         name: "Venus",
         radius: 0.87,
         color: "#e6c28b",
-        textureUrl: "/assets/textures/venus.webp",
+        textureUrl: "SolarSystem/assets/textures/venus.webp",
         orbitalRadius: 11,
         orbitalSpeed: (2 * Math.PI) / (225),    // 0.279
         rotationSpeed: -(2 * Math.PI) / (243),  // -0.259
@@ -188,7 +188,7 @@ export const solarSystemData = [
         name: "Earth",
         radius: 0.92,
         color: "#2a6bd6",
-        textureUrl: "/assets/textures/earth.webp",
+        textureUrl: "SolarSystem/assets/textures/earth.webp",
         orbitalRadius: 14,
         orbitalSpeed: (2 * Math.PI) / (365),    // 0.172
         rotationSpeed: (2 * Math.PI) / (1),     // 62.83
@@ -202,7 +202,7 @@ export const solarSystemData = [
         name: "Mars",
         radius: 0.49,
         color: "#c1440e",
-        textureUrl: "/assets/textures/mars.webp",
+        textureUrl: "SolarSystem/assets/textures/mars.webp",
         orbitalRadius: 18,
         orbitalSpeed: (2 * Math.PI) / (687),    // 0.091
         rotationSpeed: (2 * Math.PI) / (1.03),  // 60.99
@@ -216,7 +216,7 @@ export const solarSystemData = [
         name: "Jupiter",
         radius: 2.8,
         color: "#d2b48c",
-        textureUrl: "/assets/textures/jupiter.webp",
+        textureUrl: "/SolarSystem/assets/textures/jupiter.webp",
         orbitalRadius: 26,
         orbitalSpeed: (2 * Math.PI) / (4333),   // 0.0145
         rotationSpeed: (2 * Math.PI) / (0.41),  // 153.2
@@ -230,7 +230,7 @@ export const solarSystemData = [
         name: "Saturn",
         radius: 2.4,
         color: "#f5deb3",
-        textureUrl: "/assets/textures/saturn.webp",
+        textureUrl: "/SolarSystem/assets/textures/saturn.webp",
         orbitalRadius: 34,
         orbitalSpeed: (2 * Math.PI) / (10759),  // 0.00584
         rotationSpeed: (2 * Math.PI) / (0.44),  // 142.8
@@ -244,7 +244,7 @@ export const solarSystemData = [
         name: "Uranus",
         radius: 2.0,
         color: "#7fffd4",
-        textureUrl: "/assets/textures/uranus.webp",
+        textureUrl: "/SolarSystem/assets/textures/uranus.webp",
         orbitalRadius: 42,
         orbitalSpeed: (2 * Math.PI) / (30687),  // 0.00205
         rotationSpeed: -(2 * Math.PI) / (0.72), // -87.26
@@ -258,7 +258,7 @@ export const solarSystemData = [
         name: "Neptune",
         radius: 1.95,
         color: "#4169e1",
-        textureUrl: "/assets/textures/neptune.webp",
+        textureUrl: "/SolarSystem/assets/textures/neptune.webp",
         orbitalRadius: 50,
         orbitalSpeed: (2 * Math.PI) / (60190),  // 0.00104
         rotationSpeed: (2 * Math.PI) / (0.67),  // 93.7
