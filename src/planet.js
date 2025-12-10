@@ -174,7 +174,7 @@ export const solarSystemData = [
         name: "Venus",
         radius: 0.87,
         color: "#e6c28b",
-        textureUrl: "SolarSystem/assets/textures/venus.webp",
+        textureUrl: "/SolarSystem/assets/textures/venus.webp",
         orbitalRadius: 11,
         orbitalSpeed: (2 * Math.PI) / (225),    // 0.279
         rotationSpeed: -(2 * Math.PI) / (243),  // -0.259
@@ -188,7 +188,7 @@ export const solarSystemData = [
         name: "Earth",
         radius: 0.92,
         color: "#2a6bd6",
-        textureUrl: "SolarSystem/assets/textures/earth.webp",
+        textureUrl: "/SolarSystem/assets/textures/earth.webp",
         orbitalRadius: 14,
         orbitalSpeed: (2 * Math.PI) / (365),    // 0.172
         rotationSpeed: (2 * Math.PI) / (1),     // 62.83
@@ -202,7 +202,7 @@ export const solarSystemData = [
         name: "Mars",
         radius: 0.49,
         color: "#c1440e",
-        textureUrl: "SolarSystem/assets/textures/mars.webp",
+        textureUrl: "/SolarSystem/assets/textures/mars.webp",
         orbitalRadius: 18,
         orbitalSpeed: (2 * Math.PI) / (687),    // 0.091
         rotationSpeed: (2 * Math.PI) / (1.03),  // 60.99
@@ -274,7 +274,7 @@ export const moonData = [
         name: "Moon",
         radius: 0.18,
         color: "#ffffff",
-        textureUrl: "/assets/textures/moon.webp",
+        textureUrl: "/SolarSystem/assets/textures/moon.webp",
         orbitalRadius: 1.5,
         orbitalSpeed: (2 * Math.PI) / (27.3217),
         rotationSpeed: (2 * Math.PI) / (27.3217),
@@ -287,7 +287,7 @@ export const moonData = [
         name: "Moon",
         radius: 0.18,
         color: "#ffffff",
-        textureUrl: "/assets/textures/moon.webp",
+        textureUrl: "/SolarSystem/assets/textures/moon.webp",
         orbitalRadius: 1.5,
         orbitalSpeed: 0.04,
         rotationSpeed: 0.015,
