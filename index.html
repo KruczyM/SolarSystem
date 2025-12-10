@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit 🌎 - Interactive Solar System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <button id="muteButton" style="position: absolute; top: 2px; left: 2px; padding: 2px 3px; font-size: 1.5em; cursor: pointer; z-index: 1000; background-color: transparent; border: none; color: white;">🔇</button>
+</head>
+<body>
+    
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "../node_modules/three/build/three.module.js",
+            "three/": "../node_modules/three/",
+            "lil-gui": "../node_modules/lil-gui/dist/lil-gui.esm.js"
+        }
+    }
+    </script>
+
+    <script type="module" src="/src/solar-system.js"></script>
+</body>
+<footer style="position:fixed; bottom:5px; right:10px; font-size:12px; color:#aaa;">
+  Music: "Ex Machina" by Scott Buckley  
+  (<a href="https://www.scottbuckley.com.au" target="_blank">scottbuckley.com.au</a>)  
+  Licensed under  
+  <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">
+    CC BY 4.0
+  </a>
+</footer>
+</html>
