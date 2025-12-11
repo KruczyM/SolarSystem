@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { TextGeometry } from "three/examples/jsm/Addons.js";
 
 export class Planet {
     constructor(data, settings) {
@@ -9,15 +10,21 @@ export class Planet {
         this.color = data.color;
         this.textureUrl = data.textureUrl;
         this.orbitalRadius = data.orbitalRadius;
+        this.orbitalRadiusBase = data.orbitalRadius;
         this.orbitalSpeed = data.orbitalSpeed;
         this.rotationSpeed = data.rotationSpeed;
         this.funFact = data.funFact;
+        this.material = data.material;
         this.yearLength = data.yearLength;
         this.isSun = data.isSun || false;
         this.moons = [];
         this.axialTilt = data.axialTilt || 0;
         this.orbit = new THREE.Object3D();
         this.mesh = this._createMesh();
+        this.mesh.userData.planetRef = this;
+        this.labelGroup = new THREE.Object3D();
+        this.orbit.add(this.labelGroup);
+
         this.mesh.rotation.z = this.axialTilt;
         this.mesh.position.x = this.orbitalRadius;
         this.orbit.rotation.y = Math.random() * Math.PI * 2;
@@ -40,12 +47,17 @@ export class Planet {
         if (this.mesh.geometry) {
             this.mesh.geometry.dispose();
         }
-        this.mesh.geometry = new THREE.SphereGeometry(newRadius, 64, 64);
+        this.mesh.geometry = new THREE.SphereGeometry(newRadius, 128, 128);
 
     }
 
     _createMesh() {
-        const geometry = new THREE.SphereGeometry(this.radius, 64, 64);
+        const geometry = new THREE.SphereGeometry(this.radius, 128, 128);
+        if (this.material) {
+            const mesh = new THREE.Mesh(geometry, this.material);
+            mesh.userData.planetRef = this;     // <-- poprawne miejsce
+            return new THREE.Mesh(geometry, this.material);
+        }
 
         let options = {
             roughness: 1,
@@ -58,7 +70,7 @@ export class Planet {
             options.color = new THREE.Color(this.color || 0xffffff);
         }
 
-        const material = this.isSun
+        this.material = this.isSun
             ? new THREE.MeshStandardMaterial({
                 map: options.map,
                 emissive: new THREE.Color(0xffffff),
@@ -68,9 +80,10 @@ export class Planet {
                 metalness: 0
             })
             : new THREE.MeshStandardMaterial(options);
+        const mesh = new THREE.Mesh(geometry, this.material);
+        mesh.userData.planetRef = this;
 
-
-        return new THREE.Mesh(geometry, material);
+        return mesh;
     }
 
     _createOrbitLine() {
@@ -101,26 +114,59 @@ export class Planet {
         const line = new THREE.LineLoop(geometry, material);
         return line;
     }
+    createLabel(font) {
+        const geometry = new TextGeometry(this.name, {
+            font: font,
+            size: Math.max(this.radius / 3, 0.7),
+            height: 0.05,
+            depth: 0.2,
+            curveSegments: 12,
+            bevelEnabled: false
+        });
+
+        const material = new THREE.MeshBasicMaterial({
+            color: "#00FF00",
+            transparent: true,
+            opacity: 0.9
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+
+    geometry.computeBoundingBox();
+    const width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+    mesh.position.x = -width / 2;
+
+    this.label = mesh;
+    this.label.userData.planetRef = this;  
+    this.labelGroup.add(mesh);
+
+    return mesh;
+    }
 
     rebuildOrbit() {
-    if (this.orbitLine) {
-        this.orbit.remove(this.orbitLine);
-        this.orbitLine.geometry.dispose();
-        this.orbitLine.material.dispose();
-    }
+        if (this.orbitLine) {
+            this.orbit.remove(this.orbitLine);
+            this.orbitLine.geometry.dispose();
+            this.orbitLine.material.dispose();
+        }
 
-    this.orbitLine = this._createOrbitLine();
-    if (this.orbitLine) {
-        this.orbit.add(this.orbitLine);
-    }
+        this.orbitLine = this._createOrbitLine();
+        if (this.orbitLine) {
+            this.orbit.add(this.orbitLine);
+        }
 
-    this.mesh.position.x = this.orbitalRadius;
-}
+        this.mesh.position.x = this.orbitalRadius;
+    }
 
     update(delta) {
 
         if (!this.isSun) {
             this.orbit.rotation.y += this.orbitalSpeed * this.settings.orbitSpeedMultiplier * delta;
+        }
+        //label position
+        if (this.labelGroup) {
+            this.labelGroup.position.copy(this.mesh.position);
+            this.labelGroup.position.y += this.radius + 1.2;
         }
 
         this.mesh.rotation.y += this.rotationSpeed * this.settings.rotationSpeedMultiplier * delta;
@@ -146,7 +192,7 @@ export const solarSystemData = [
         name: "Sun",
         radius: 5,
         color: "#ffffff",
-        textureUrl: "/SolarSystem/assets/textures/sun.png",
+        textureUrl: "./assets/textures/sun.png",
         orbitalRadius: 0,
         orbitalSpeed: 0,
         rotationSpeed: (2 * Math.PI) / (36), // 0.15
@@ -160,7 +206,7 @@ export const solarSystemData = [
         name: "Mercury",
         radius: 0.35,
         color: "#b1b1b1",
-        textureUrl: "/SolarSystem/assets/textures/mercury.webp",
+        textureUrl: "./assets/textures/mercury.webp",
         orbitalRadius: 8,
         orbitalSpeed: (2 * Math.PI) / (88),      // 0.713
         rotationSpeed: (2 * Math.PI) / (58.6),  // 1.072
@@ -174,7 +220,7 @@ export const solarSystemData = [
         name: "Venus",
         radius: 0.87,
         color: "#e6c28b",
-        textureUrl: "/SolarSystem/assets/textures/venus.webp",
+        textureUrl: "./assets/textures/venus.webp",
         orbitalRadius: 11,
         orbitalSpeed: (2 * Math.PI) / (225),    // 0.279
         rotationSpeed: -(2 * Math.PI) / (243),  // -0.259
@@ -188,7 +234,7 @@ export const solarSystemData = [
         name: "Earth",
         radius: 0.92,
         color: "#2a6bd6",
-        textureUrl: "/SolarSystem/assets/textures/earth.webp",
+        textureUrl: "./assets/textures/earth.webp",
         orbitalRadius: 14,
         orbitalSpeed: (2 * Math.PI) / (365),    // 0.172
         rotationSpeed: (2 * Math.PI) / (1),     // 62.83
@@ -202,7 +248,7 @@ export const solarSystemData = [
         name: "Mars",
         radius: 0.49,
         color: "#c1440e",
-        textureUrl: "/SolarSystem/assets/textures/mars.webp",
+        textureUrl: "./assets/textures/mars.webp",
         orbitalRadius: 18,
         orbitalSpeed: (2 * Math.PI) / (687),    // 0.091
         rotationSpeed: (2 * Math.PI) / (1.03),  // 60.99
@@ -216,7 +262,7 @@ export const solarSystemData = [
         name: "Jupiter",
         radius: 2.8,
         color: "#d2b48c",
-        textureUrl: "/SolarSystem/assets/textures/jupiter.webp",
+        textureUrl: "./assets/textures/jupiter.webp",
         orbitalRadius: 26,
         orbitalSpeed: (2 * Math.PI) / (4333),   // 0.0145
         rotationSpeed: (2 * Math.PI) / (0.41),  // 153.2
@@ -230,7 +276,7 @@ export const solarSystemData = [
         name: "Saturn",
         radius: 2.4,
         color: "#f5deb3",
-        textureUrl: "/SolarSystem/assets/textures/saturn.webp",
+        textureUrl: "./assets/textures/saturn.webp",
         orbitalRadius: 34,
         orbitalSpeed: (2 * Math.PI) / (10759),  // 0.00584
         rotationSpeed: (2 * Math.PI) / (0.44),  // 142.8
@@ -244,7 +290,7 @@ export const solarSystemData = [
         name: "Uranus",
         radius: 2.0,
         color: "#7fffd4",
-        textureUrl: "/SolarSystem/assets/textures/uranus.webp",
+        textureUrl: "./assets/textures/uranus.webp",
         orbitalRadius: 42,
         orbitalSpeed: (2 * Math.PI) / (30687),  // 0.00205
         rotationSpeed: -(2 * Math.PI) / (0.72), // -87.26
@@ -258,7 +304,7 @@ export const solarSystemData = [
         name: "Neptune",
         radius: 1.95,
         color: "#4169e1",
-        textureUrl: "/SolarSystem/assets/textures/neptune.webp",
+        textureUrl: "./assets/textures/neptune.webp",
         orbitalRadius: 50,
         orbitalSpeed: (2 * Math.PI) / (60190),  // 0.00104
         rotationSpeed: (2 * Math.PI) / (0.67),  // 93.7
@@ -274,7 +320,7 @@ export const moonData = [
         name: "Moon",
         radius: 0.18,
         color: "#ffffff",
-        textureUrl: "/SolarSystem/assets/textures/moon.webp",
+        textureUrl: "./assets/textures/moon.webp",
         orbitalRadius: 1.5,
         orbitalSpeed: (2 * Math.PI) / (27.3217),
         rotationSpeed: (2 * Math.PI) / (27.3217),
@@ -287,7 +333,7 @@ export const moonData = [
         name: "Moon",
         radius: 0.18,
         color: "#ffffff",
-        textureUrl: "/SolarSystem/assets/textures/moon.webp",
+        textureUrl: "./assets/textures/moon.webp",
         orbitalRadius: 1.5,
         orbitalSpeed: 0.04,
         rotationSpeed: 0.015,
@@ -297,3 +343,5 @@ export const moonData = [
 
     }
 ];
+
+

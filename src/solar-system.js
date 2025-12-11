@@ -5,11 +5,13 @@ import { createPlanetFolder } from './gui-helper.js';
 import { getNebula, createStarField, animateStars, animateNebula } from './environment.js';
 import { initPlanetHoverDetection } from './planetInfo.js';
 import { setupAudio } from './audioManager.js';
-
+import { loadFont } from "./fontManager.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.18/+esm";
+import GUI from "lil-gui";
+import { GeometryHelper, initClicks } from './helper.js';
 
 
+const globalFont = await loadFont("./assets/fonts/helvetiker_bold.typeface.json");
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(
     36,
@@ -17,7 +19,7 @@ let camera = new THREE.PerspectiveCamera(
     0.1,
     2000
 );
-const backgroundMusic = setupAudio(camera, '/SolarSystem/assets/music/space.mp3');
+const backgroundMusic = setupAudio(camera, './assets/music/space.mp3');
 camera.position.set(10, 12, 48);
 camera.lookAt(0, 0, 0)
 scene.add(camera);
@@ -101,7 +103,22 @@ scene.add(sunLight);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.03);
 scene.add(ambientLight);
 
+// 3d text
+const geometryHelper = new GeometryHelper();
+const text3d = geometryHelper.create3dText({
+    depth: 0.5,
+    size: 30,
+    height: 1,
+    curveSegments: 36,
+    callbackReady: text3d => {
+        scene.add(text3d);
+text3d.position.set(-227.7, -6.5, -300);
+text3d.rotation.set(0, 0, 0);  
 
+    }
+});
+
+//create planets and moons
 const planets = []
 // for speed up self rotation and orbit fly time
 const settings = {
@@ -121,6 +138,21 @@ solarSystemData.forEach(data => {
 });
 
 
+//create labels
+
+    planets.forEach(planet => {
+        planet.createLabel(globalFont);
+        if (planet.moons.length > 0) {
+            planet.moons.forEach(moon => {
+                moon.createLabel(globalFont);
+            });
+        }
+    });
+
+
+//add click events
+initClicks(renderer, camera, orbitControls, planets);
+
 window.addEventListener('resize', () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -131,7 +163,8 @@ window.addEventListener('resize', () => {
     renderer.setSize(w, h);
 });
 
-
+const moonMaterial = geometryHelper.getMoonMaterial();
+const planetMaterial = geometryHelper.getPlanetMaterial();
 const gui = new GUI();
 gui.add(settings, "sizeMultiplier", 0.5, 10, 0.1).name("global size")
     .onChange(value => {
@@ -149,40 +182,52 @@ systemFolder.add({
     addPlanet: () => {
         const data = {
             name: "New Planet " + planets.length,
-            radius: 0.8,
-            color: "#8888ff",
+            radius: 1.2,
+            color: "#e3fc01ff",
+            material: planetMaterial,
             orbitalRadius: 20 + planets.length * 5,
-            orbitalSpeed: 0.2,
+            orbitalSpeed: 0.01,
             rotationSpeed: 1,
             axialTilt: 0
         };
 
         const planet = new Planet(data, settings);
         planets.push(planet);
+
+        planet.createLabel(globalFont);
         scene.add(planet.orbit);
 
-        createPlanetFolder(gui, planet, planets, scene, settings);
+        createPlanetFolder(gui, planet, planets, scene, settings, globalFont);
     }
 }, "addPlanet").name("➕ add planet");
 
 planets.forEach(planet => {
-    createPlanetFolder(gui, planet, planets, scene, settings);
+    createPlanetFolder(gui, planet, planets, scene, settings,globalFont);
 });
 
 const clock = new THREE.Clock();
 
 function animate() {
     requestAnimationFrame(animate);
+    if (text3d) {
+    text3d.rotation.y = Math.sin(performance.now() * 0.0003) * 0.15;
+}
     const delta = clock.getDelta();
     animateStars();
-
+    planets.forEach(planet => {
+    if (planet.labelGroup) {
+        planet.labelGroup.lookAt(camera.position);
+        planet.moons.forEach(moon => {
+            moon.labelGroup.lookAt(camera.position);
+        });
+    }
+});
     animateNebula(nebulaFar, delta);
     animateNebula(nebulaMid, delta);
     planets.forEach(p => {
         p.update(delta)
     }
     );
-
     composer.render();
 }
 animate();

@@ -13,11 +13,11 @@ export function initPlanetHoverDetection(camera, scene, renderer, planets) {
 
     infoPanel = document.createElement('div');
     infoPanel.style.position = 'absolute';
-    infoPanel.style.top = '30px';
-    infoPanel.style.left = '10px';
+    infoPanel.style.top = '5px';
+    infoPanel.style.left = '30px';
     infoPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     infoPanel.style.color = 'white';
-    infoPanel.style.padding = '10px';
+    infoPanel.style.padding = '5px';
     infoPanel.style.fontFamily = 'monospace';
     infoPanel.style.borderRadius = '5px';
     infoPanel.style.display = 'none';
