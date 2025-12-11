@@ -124,7 +124,7 @@ const planets = []
 const settings = {
     sizeMultiplier: 1,
     orbitSpeedMultiplier: 1,
-    rotationSpeedMultiplier: 1,
+    rotationSpeedMultiplier: 0.1,
 };
 solarSystemData.forEach(data => {
     const planet = new Planet(data, settings);
