@@ -39,6 +39,22 @@ export class Planet {
             this.orbit.add(this.orbitLine);
         }
 
+        // if (data.ring) {
+        //     this._createRing(data.ring.inner, data.ring.outer);
+        // }
+        if (data.ring) {
+            const { inner, outer, textureUrl } = data.ring;
+
+            this.ring = this._createRing(
+                inner,
+                outer,
+                textureUrl,
+                THREE.MathUtils.degToRad(this.axialTilt)
+            );
+
+            this.mesh.add(this.ring);
+        }
+
     }
 
     rebuildGeometry(newRadius) {
@@ -84,6 +100,53 @@ export class Planet {
         mesh.userData.planetRef = this;
 
         return mesh;
+    }
+
+    // _createRing(inner, outer) {
+    //     const geometry_ring = new THREE.RingGeometry(inner, outer, 128).rotateX(-Math.PI / 2);
+    //     const material_ring = new THREE.MeshBasicMaterial({
+    //         color: 0xffffaa,
+    //         side: THREE.DoubleSide
+    //     });
+    //     const ring = new THREE.Mesh(geometry_ring, material_ring);
+
+    //     this.mesh.add(ring);
+
+    // }
+
+    _createRing(innerRadius, outerRadius, textureUrl, tilt = 0) {
+        const geometry = new THREE.RingGeometry(innerRadius, outerRadius, 256);
+
+        // UV FIX — bez tego tekstura wygląda źle!
+        const pos = geometry.attributes.position;
+        const uv = geometry.attributes.uv;
+
+        for (let i = 0; i < pos.count; i++) {
+            const x = pos.getX(i);
+            const y = pos.getY(i);
+            const r = Math.sqrt(x * x + y * y);
+            const t = (r - innerRadius) / (outerRadius - innerRadius);
+            uv.setXY(i, 1 - t, t);
+        }
+
+        const texture = new THREE.TextureLoader().load(textureUrl);
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.colorSpace = THREE.SRGBColorSpace; // wygląda ładniej
+
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false   // zapobiega błędom znikania
+        });
+
+        const ring = new THREE.Mesh(geometry, material);
+
+        ring.rotation.x = Math.PI / 2;
+        ring.rotation.z = tilt;
+
+        return ring;
     }
 
     _createOrbitLine() {
@@ -132,15 +195,15 @@ export class Planet {
 
         const mesh = new THREE.Mesh(geometry, material);
 
-    geometry.computeBoundingBox();
-    const width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
-    mesh.position.x = -width / 2;
+        geometry.computeBoundingBox();
+        const width = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+        mesh.position.x = -width / 2;
 
-    this.label = mesh;
-    this.label.userData.planetRef = this;  
-    this.labelGroup.add(mesh);
+        this.label = mesh;
+        this.label.userData.planetRef = this;
+        this.labelGroup.add(mesh);
 
-    return mesh;
+        return mesh;
     }
 
     rebuildOrbit() {
@@ -168,6 +231,10 @@ export class Planet {
             this.labelGroup.position.copy(this.mesh.position);
             this.labelGroup.position.y += this.radius + 1.2;
         }
+        // //ring
+        // if (this.ring) {
+        //     this.ring.rotation.y += this.rotationSpeed * this.ringDirection * 0.5;
+        // }
 
         this.mesh.rotation.y += this.rotationSpeed * this.settings.rotationSpeedMultiplier * delta;
         this.moons.forEach(moon => moon.update(delta));
@@ -269,6 +336,11 @@ export const solarSystemData = [
         axialTilt: 0.0541,
         funFact: "Jupiter could fit over 1,300 Earths inside.",
         yearLength: "11.86 years",
+        ring: {
+            inner: 3,
+            outer: 4.5,
+            textureUrl: "./assets/textures/rings/jupiter_ring.webp"
+        }
 
     },
 
@@ -283,7 +355,11 @@ export const solarSystemData = [
         axialTilt: 0.466,
         funFact: "Saturn is so light it could float in water.",
         yearLength: "29.5 years",
-
+        ring: {
+            inner: 6,
+            outer: 9,
+            textureUrl: "./assets/textures/rings/saturn_ring.jpg"
+        }
     },
 
     {
@@ -297,6 +373,11 @@ export const solarSystemData = [
         axialTilt: 1.7069,
         funFact: "Uranus rotates on its side.",
         yearLength: "84 years",
+        ring: {
+            inner: 4,
+            outer: 5.5,
+            textureUrl: "./assets/textures/rings/uranus_ring.png"
+        }
 
     },
 
@@ -311,7 +392,11 @@ export const solarSystemData = [
         axialTilt: 0.4939,
         funFact: "Neptune has the fastest winds in the Solar System.",
         yearLength: "165 years",
-
+        ring: {
+            inner: 3,
+            outer: 4.5,
+            textureUrl: "./assets/textures/rings/neptune_ring.png"
+        }
     }
 ];
 
@@ -343,5 +428,3 @@ export const moonData = [
 
     }
 ];
-
-

@@ -14,11 +14,21 @@ folder.add(planet, "name").name("name").onChange(newName => {
     folder.title(newName); 
 });
     folder.add(planet, "radius", 0, 10, 0.1).name("radius").onChange(v => {
+        if (planet.isSun){
+            planet.rebuildGeometry(v);
+            planets.forEach(p => {
+                if (p.isSun) return;
+                p.orbitalRadius = p.orbitalRadiusBase + v;
+                p.rebuildOrbit()
+            });
+        }else{
         planet.rebuildGeometry(v);
         planet.moons.forEach(moon => {
              moon.orbitalRadius = moon.orbitalRadiusBase + v;
              moon.rebuildOrbit()}
             );
+        }
+
     });
     if (planet.name !== "Sun")folder.add(planet, "orbitalRadius", 0, 200, 0.1).name("orbital radius")
         .onChange(v => {
