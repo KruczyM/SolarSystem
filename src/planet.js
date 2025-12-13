@@ -337,7 +337,7 @@ export const solarSystemData = [
         funFact: "Jupiter could fit over 1,300 Earths inside.",
         yearLength: "11.86 years",
         ring: {
-            inner: 3,
+            inner: 3.8,
             outer: 4.5,
             textureUrl: "./assets/textures/rings/jupiter_ring.webp"
         }
@@ -376,7 +376,7 @@ export const solarSystemData = [
         ring: {
             inner: 4,
             outer: 5.5,
-            textureUrl: "./assets/textures/rings/uranus_ring.png"
+            textureUrl: "./assets/textures/rings/uranus_ring.jpg"
         }
 
     },
