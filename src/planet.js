@@ -81,7 +81,9 @@ export class Planet {
         };
 
         if (this.textureUrl) {
-            options.map = new THREE.TextureLoader().load(this.textureUrl);
+            const texture = new THREE.TextureLoader().load(this.textureUrl);
+            texture.colorSpace = THREE.SRGBColorSpace;
+            options.map = texture;
         } else {
             options.color = new THREE.Color(this.color || 0xffffff);
         }
