@@ -180,6 +180,9 @@ export class Planet {
         return line;
     }
     createLabel(font) {
+        if (this.label) {
+            this.labelGroup.remove(this.label);
+        };
         const geometry = new TextGeometry(this.name, {
             font: font,
             size: Math.max(this.radius / 3, 0.7),

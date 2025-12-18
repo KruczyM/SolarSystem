@@ -11,7 +11,8 @@ export function createPlanetFolder(gui, planet, planets) {
     const font = getFont();
     // Planet
 folder.add(planet, "name").name("name").onChange(newName => {
-    folder.title(newName); 
+    folder.title(newName);
+    planet.createLabel(font); 
 });
     folder.add(planet, "radius", 0, 10, 0.1).name("radius").onChange(v => {
         if (planet.isSun){
