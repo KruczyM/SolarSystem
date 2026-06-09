@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { TextGeometry } from "three/examples/jsm/Addons.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
 export class Planet {
     constructor(data, settings) {
@@ -67,12 +67,50 @@ export class Planet {
 
     }
 
+    setColor(value) {
+        this.color = value;
+
+        const materials = Array.isArray(this.mesh.material)
+            ? this.mesh.material
+            : [this.mesh.material];
+
+        materials.forEach(material => {
+            if (material.color) {
+                material.color.set(value);
+            }
+
+            // Stronger visible color influence for textured/material planets
+            if (material.emissive) {
+                material.emissive.set(value);
+
+                if (this.isSun) {
+                    material.emissiveIntensity = 1.5;
+                } else {
+                    material.emissiveIntensity = 0.05;
+                }
+            }
+
+            material.needsUpdate = true;
+        });
+    }
+
     _createMesh() {
         const geometry = new THREE.SphereGeometry(this.radius, 128, 128);
         if (this.material) {
+            this.material = this.material.clone();
+
+            if (this.material.color && this.color) {
+                this.material.color.set(this.color);
+            }
+
+            if (this.material.emissive && this.color) {
+                this.material.emissive.set(this.color);
+                this.material.emissiveIntensity = this.isSun ? 1.5 : 0.25;
+            }
+
             const mesh = new THREE.Mesh(geometry, this.material);
-            mesh.userData.planetRef = this;     // <-- poprawne miejsce
-            return new THREE.Mesh(geometry, this.material);
+            mesh.userData.planetRef = this;
+            return mesh;
         }
 
         let options = {
@@ -119,7 +157,6 @@ export class Planet {
     _createRing(innerRadius, outerRadius, textureUrl, tilt = 0) {
         const geometry = new THREE.RingGeometry(innerRadius, outerRadius, 256);
 
-        // UV FIX — bez tego tekstura wygląda źle!
         const pos = geometry.attributes.position;
         const uv = geometry.attributes.uv;
 
@@ -134,13 +171,13 @@ export class Planet {
         const texture = new THREE.TextureLoader().load(textureUrl);
         texture.wrapS = THREE.ClampToEdgeWrapping;
         texture.wrapT = THREE.ClampToEdgeWrapping;
-        texture.colorSpace = THREE.SRGBColorSpace; // wygląda ładniej
+        texture.colorSpace = THREE.SRGBColorSpace;
 
         const material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true,
             side: THREE.DoubleSide,
-            depthWrite: false   // zapobiega błędom znikania
+            depthWrite: false
         });
 
         const ring = new THREE.Mesh(geometry, material);
@@ -180,9 +217,6 @@ export class Planet {
         return line;
     }
     createLabel(font) {
-        if (this.label) {
-            this.labelGroup.remove(this.label);
-        };
         const geometry = new TextGeometry(this.name, {
             font: font,
             size: Math.max(this.radius / 3, 0.7),
@@ -433,3 +467,5 @@ export const moonData = [
 
     }
 ];
+
+

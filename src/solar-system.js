@@ -1,46 +1,42 @@
 import * as THREE from 'three';
 import { Planet, solarSystemData, moonData } from './planet.js';
-import { EffectComposer, RenderPass, UnrealBloomPass } from 'three/examples/jsm/Addons.js';
-import { createPlanetFolder } from './gui-helper.js';
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { getNebula, createStarField, animateStars, animateNebula } from './environment.js';
 import { initPlanetHoverDetection } from './planetInfo.js';
 import { setupAudio } from './audioManager.js';
+import { GeometryHelper, initClicks, focusCameraOnPlanet } from './helper.js';
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { loadFont } from "./fontManager.js";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import GUI from "lil-gui";
-import { GeometryHelper, initClicks } from './helper.js';
-
+import { createAppUi } from './mobile-ui.js';
 
 const globalFont = await loadFont("./assets/fonts/helvetiker_bold.typeface.json");
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
     36,
     window.innerWidth / window.innerHeight,
     0.1,
     2000
 );
-const backgroundMusic = setupAudio(camera, './assets/music/space.mp3');
+
 camera.position.set(10, 12, 48);
-camera.lookAt(0, 0, 0)
+camera.lookAt(0, 0, 0);
 scene.add(camera);
 scene.fog = new THREE.FogExp2(0x020308, 0.0006);
 
-
-let renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor(0x000000, 1);
-
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.25;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-
 document.body.appendChild(renderer.domElement);
 
-//stars
 createStarField(scene);
 
-//nebula
 const nebulaFar = getNebula({
     numSprites: 25,
     radius: 300,
@@ -66,170 +62,230 @@ const nebulaMid = getNebula({
 scene.add(nebulaFar, nebulaMid);
 nebulaFar.position.set(-280, 120, -500);
 nebulaFar.rotation.z = 0.6;
-
 nebulaMid.position.set(350, -140, -650);
 nebulaMid.rotation.z = -0.4;
-
 nebulaFar.renderOrder = -10;
 nebulaMid.renderOrder = -10;
 
-
-// bloom
 const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.55,   // strength
-    0.25,   // radius
-    0.55   // threshold
+    0.55,
+    0.25,
+    0.55
 );
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 composer.addPass(bloomPass);
 
-
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-
 const orbitControls = new OrbitControls(camera, renderer.domElement);
+const startCameraPosition = camera.position.clone();
+const startTarget = orbitControls.target.clone();
 
-
-// Light emitted by the Sun (realistic)
 const sunLight = new THREE.PointLight(0xffffff, 3.5, 300, 0.1);
 sunLight.position.set(0, 0, 0);
 scene.add(sunLight);
 
-// Subtle ambient space light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.03);
 scene.add(ambientLight);
 
-// 3d text
 const geometryHelper = new GeometryHelper();
-const text3d = geometryHelper.create3dText({
+const planetMaterial = geometryHelper.getPlanetMaterial();
+const moonMaterial = geometryHelper.getMoonMaterial();
+
+let text3d = null;
+geometryHelper.create3dText({
     depth: 0.5,
     size: 30,
     height: 1,
     curveSegments: 36,
-    callbackReady: text3d => {
+    callbackReady: mesh => {
+        text3d = mesh;
         scene.add(text3d);
-text3d.position.set(-227.7, -6.5, -300);
-text3d.rotation.set(0, 0, 0);  
-
+        text3d.position.set(-227.7, -6.5, -300);
+        text3d.rotation.set(0, 0, 0);
     }
 });
 
-//create planets and moons
-const planets = []
-// for speed up self rotation and orbit fly time
+const planets = [];
 const settings = {
     sizeMultiplier: 1,
     orbitSpeedMultiplier: 1,
     rotationSpeedMultiplier: 0.1,
 };
+
 solarSystemData.forEach(data => {
     const planet = new Planet(data, settings);
     planets.push(planet);
     scene.add(planet.orbit);
-
 
     if (planet.name === "Earth") {
         planet.addMoon(moonData[0], settings);
     }
 });
 
-
-//create labels
-
-    planets.forEach(planet => {
-        planet.createLabel(globalFont);
-        if (planet.moons.length > 0) {
-            planet.moons.forEach(moon => {
-                moon.createLabel(globalFont);
-            });
-        }
-    });
-
-
-//add click events
-initClicks(renderer, camera, orbitControls, planets);
-
-window.addEventListener('resize', () => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(w, h);
+planets.forEach(planet => {
+    planet.createLabel(globalFont);
+    planet.moons.forEach(moon => moon.createLabel(globalFont));
 });
 
-const moonMaterial = geometryHelper.getMoonMaterial();
-const planetMaterial = geometryHelper.getPlanetMaterial();
-const gui = new GUI();
-gui.add(settings, "sizeMultiplier", 0.5, 10, 0.1).name("global size")
-    .onChange(value => {
-        planets.forEach(p => {
-            const newRadius = p.baseRadius * value;
-            p.rebuildGeometry(newRadius);
+initClicks(renderer, camera, orbitControls, planets);
+
+function applyGlobalSize(value) {
+    planets.forEach(planet => {
+        const newRadius = planet.baseRadius * value;
+        planet.rebuildGeometry(newRadius);
+
+        if (planet.ring) {
+            planet.ring.scale.set(value, value, 1);
+        }
+
+        planet.moons.forEach(moon => {
+            const newMoonRadius = moon.baseRadius * value;
+            moon.rebuildGeometry(newMoonRadius);
+
+            if (moon.ring) {
+                moon.ring.scale.set(value, value, 1);
+            }
         });
     });
-gui.add(settings, "orbitSpeedMultiplier", 0, 1000, 0.1).name("orbit speed");
-gui.add(settings, "rotationSpeedMultiplier", 0, 1, 0.1).name("rotation speed");
+}
 
-const systemFolder = gui.addFolder("SYSTEM");
+function focusPlanet(planet) {
+    const targetPosition = planet.mesh.getWorldPosition(new THREE.Vector3());
+    const distance = Math.max(planet.radius * 8, 12);
+    const offset = new THREE.Vector3(distance, distance * 0.45, distance);
 
-systemFolder.add({
-    addPlanet: () => {
-        const data = {
-            name: "New Planet " + planets.length,
-            radius: 1.2,
-            color: "#e3fc01ff",
-            material: planetMaterial,
-            orbitalRadius: 20 + planets.length * 5,
-            orbitalSpeed: 0.01,
-            rotationSpeed: 1,
-            axialTilt: 0
-        };
+    camera.position.copy(targetPosition).add(offset);
+    orbitControls.target.copy(targetPosition);
+    orbitControls.update();
+}
 
-        const planet = new Planet(data, settings);
-        planets.push(planet);
+function addPlanet() {
+    const data = {
+        name: "New Planet " + planets.length,
+        radius: 1.2,
+        color: "#e3fc01",
+        material: planetMaterial,
+        orbitalRadius: 20 + planets.length * 5,
+        orbitalSpeed: 0.01,
+        rotationSpeed: 1,
+        axialTilt: 0,
+        funFact: "Custom planet.",
+        yearLength: "—"
+    };
 
-        planet.createLabel(globalFont);
-        scene.add(planet.orbit);
+    const planet = new Planet(data, settings);
+    planets.push(planet);
+    planet.createLabel(globalFont);
+    scene.add(planet.orbit);
+    return planet;
+}
 
-        createPlanetFolder(gui, planet, planets, scene, settings, globalFont);
+function removePlanet(planet) {
+    if (!planet) return;
+    const index = planets.indexOf(planet);
+    if (index !== -1) planets.splice(index, 1);
+    planet.dispose();
+}
+
+function addMoon(planet) {
+    if (!planet) return null;
+
+    const data = {
+        name: "New Moon",
+        radius: 0.5,
+        color: "#ffffff",
+        material: moonMaterial,
+        orbitalRadius: planet.radius + 4,
+        orbitalSpeed: 0.5,
+        rotationSpeed: 0.5,
+        axialTilt: 0,
+        funFact: "Custom moon.",
+        yearLength: "—"
+    };
+
+    const moon = planet.addMoon(data);
+    moon.createLabel(globalFont);
+    return moon;
+}
+
+function removeMoon(planet, moon) {
+    if (!planet || !moon) return;
+
+    const index = planet.moons.indexOf(moon);
+    if (index !== -1) planet.moons.splice(index, 1);
+
+    if (moon.orbit.parent) {
+        moon.orbit.parent.remove(moon.orbit);
     }
-}, "addPlanet").name("➕ add planet");
 
-planets.forEach(planet => {
-    createPlanetFolder(gui, planet, planets, scene, settings,globalFont);
+    moon.dispose();
+}
+
+createAppUi({
+    camera,
+    controls: orbitControls,
+    planets,
+    settings,
+    startCameraPosition,
+    startTarget,
+    actions: {
+        applyGlobalSize,
+        focusPlanet,
+        addPlanet,
+        removePlanet,
+        addMoon,
+        removeMoon,
+        focusPlanet: (planet) => {
+            focusCameraOnPlanet(camera, orbitControls, planet);
+        }
+    }
+});
+
+setupAudio(camera, './assets/music/space.mp3');
+
+window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+    composer.setSize(width, height);
 });
 
 const clock = new THREE.Clock();
 
 function animate() {
     requestAnimationFrame(animate);
+
     if (text3d) {
-    text3d.rotation.y = Math.sin(performance.now() * 0.0003) * 0.15;
-}
+        text3d.rotation.y = Math.sin(performance.now() * 0.0003) * 0.15;
+    }
+
     const delta = clock.getDelta();
     animateStars();
+
     planets.forEach(planet => {
-    if (planet.labelGroup) {
-        planet.labelGroup.lookAt(camera.position);
+        if (planet.labelGroup) {
+            planet.labelGroup.lookAt(camera.position);
+        }
+
         planet.moons.forEach(moon => {
-            moon.labelGroup.lookAt(camera.position);
+            if (moon.labelGroup) {
+                moon.labelGroup.lookAt(camera.position);
+            }
         });
-    }
-});
+    });
+
     animateNebula(nebulaFar, delta);
     animateNebula(nebulaMid, delta);
-    planets.forEach(p => {
-        p.update(delta)
-    }
-    );
+    planets.forEach(planet => planet.update(delta));
+
     composer.render();
 }
-animate();
 
+animate();
 initPlanetHoverDetection(camera, scene, renderer, planets);
