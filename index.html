@@ -6,60 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/src/styles/app.css" />
+
   <title>Orbit 🌎 - Interactive Solar System</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    body {
-      position: relative;
-    }
-
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    footer {
-      position: fixed;
-      right: 10px;
-      bottom: 5px;
-      z-index: 20;
-
-      max-width: 320px;
-
-      color: #aaa;
-      font-size: 12px;
-      line-height: 1.4;
-      text-align: right;
-
-      pointer-events: auto;
-    }
-
-    footer a {
-      color: #aaa;
-    }
-
-    @media (max-width: 768px) {
-      footer {
-        display: none;
-      }
-    }
-  </style>
 </head>
 
 <body>
@@ -75,15 +24,59 @@
     }
   </script>
 
+  <div class="app-ui" aria-label="Application controls">
+    <div class="app-floating-actions">
+      <button id="muteButton" class="app-icon-button" type="button" aria-label="Toggle sound">🔇</button>
+      <button
+        id="menuToggle"
+        class="app-icon-button"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="appMenu"
+      >☰</button>
+    </div>
+
+    <div id="menuBackdrop" class="app-menu-backdrop" hidden></div>
+
+    <nav id="appMenu" class="app-menu" aria-label="Main menu" aria-hidden="true">
+      <div class="app-menu__handle" aria-hidden="true"></div>
+
+      <div class="app-menu__header">
+        <strong>Controls</strong>
+        <button class="app-menu__close" type="button" data-action="close" aria-label="Close menu">×</button>
+      </div>
+
+      <div class="app-menu__section">
+        <button type="button" data-action="reset-view">Reset view</button>
+        <button type="button" data-action="toggle-labels" id="toggleLabelsButton">Hide labels</button>
+        <button type="button" data-action="add-planet">➕ Add planet</button>
+      </div>
+
+      <div class="app-menu__section">
+        <p class="app-menu__section-title">Global settings</p>
+        <div id="globalControls"></div>
+      </div>
+
+      <div class="app-menu__section">
+        <p class="app-menu__section-title">Focus planet</p>
+        <div id="planetQuickActions" class="planet-actions"></div>
+      </div>
+
+      <div class="app-menu__section">
+        <p class="app-menu__section-title">Planet editor</p>
+        <div id="planetEditor" class="planet-editor"></div>
+      </div>
+    </nav>
+  </div>
+
   <script type="module" src="/src/solar-system.js"></script>
 
-  <footer>
+  <footer class="music-credit">
     Music: "Ex Machina" by Scott Buckley
     (<a href="https://www.scottbuckley.com.au" target="_blank" rel="noreferrer">scottbuckley.com.au</a>)
     Licensed under
-    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
-      CC BY 4.0
-    </a>
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
   </footer>
 </body>
 </html>
