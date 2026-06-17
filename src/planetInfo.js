@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { t } from "./i18n.js";
 
 let raycaster;
 let mouse;
@@ -68,11 +69,11 @@ function onHover(event, camera, scene, planets) {
 
 function displayPlanetInfo(planet) {
     infoPanel.innerHTML = `
-        <strong>Name:</strong> ${planet.name}<br>
-        <strong>Size:</strong> ${planet.radius.toFixed(2)} units<br>
-        <strong>Distance:</strong> ${planet.orbitalRadius.toFixed(2)} units<br>
-        <strong>Year Length:</strong> ${planet.yearLength}<br>
-        <strong>Fun Fact:</strong> ${planet.funFact}
+        <strong>${t('name')}:</strong> ${planet.name}<br>
+        <strong>${t('size')}:</strong> ${planet.radius.toFixed(2)} ${t('units')}<br>
+        <strong>${t('distance')}:</strong> ${planet.orbitalRadius.toFixed(2)} ${t('units')}<br>
+        <strong>${t('yearLength')}:</strong> ${planet.yearLength}<br>
+        <strong>${t('funFact')}:</strong> ${planet.funFact}
     `;
     infoPanel.style.display = 'block';
 }

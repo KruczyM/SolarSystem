@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { t } from "./i18n.js";
 
 let isAudioLoaded = false;
 let userInteracted = false;
@@ -14,11 +15,9 @@ export function setupAudio(camera, audioPath) {
     function updateMuteButton() {
         if (!muteButton) return;
 
-        muteButton.textContent = sound.isPlaying ? '🔊' : '🔇';
-        muteButton.setAttribute(
-            'aria-label',
-            sound.isPlaying ? 'Mute background music' : 'Play background music'
-        );
+        muteButton.textContent = sound.isPlaying ? t('soundOnShort') : t('soundOffShort');
+        muteButton.textContent = sound.isPlaying ? t('soundOnShort') : t('soundOffShort');
+        muteButton.setAttribute('aria-label', sound.isPlaying ? t('soundOn') : t('soundOff'));
     }
 
     function playSound() {

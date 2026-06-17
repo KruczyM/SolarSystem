@@ -10,6 +10,10 @@ import { GeometryHelper, initClicks, focusCameraOnPlanet } from './helper.js';
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { loadFont } from "./fontManager.js";
 import { createAppUi } from './mobile-ui.js';
+import { getLanguage, t, translateBodies } from './i18n.js';
+
+document.documentElement.lang = getLanguage();
+document.title = t('title');
 
 const globalFont = await loadFont("./assets/fonts/helvetiker_bold.typeface.json");
 
@@ -114,13 +118,15 @@ const settings = {
     rotationSpeedMultiplier: 0.1,
 };
 
-solarSystemData.forEach(data => {
+const localizedMoonData = translateBodies(moonData);
+
+translateBodies(solarSystemData).forEach((data, index) => {
     const planet = new Planet(data, settings);
     planets.push(planet);
     scene.add(planet.orbit);
 
-    if (planet.name === "Earth") {
-        planet.addMoon(moonData[0], settings);
+    if (solarSystemData[index].name === "Earth") {
+        planet.addMoon(localizedMoonData[0], settings);
     }
 });
 
@@ -163,7 +169,7 @@ function focusPlanet(planet) {
 
 function addPlanet() {
     const data = {
-        name: "New Planet " + planets.length,
+        name: `${t('newPlanet')} ${planets.length}`,
         radius: 1.2,
         color: "#e3fc01",
         material: planetMaterial,
@@ -171,8 +177,8 @@ function addPlanet() {
         orbitalSpeed: 0.01,
         rotationSpeed: 1,
         axialTilt: 0,
-        funFact: "Custom planet.",
-        yearLength: "—"
+        funFact: t('customPlanetFact'),
+        yearLength: "-"
     };
 
     const planet = new Planet(data, settings);
@@ -193,7 +199,7 @@ function addMoon(planet) {
     if (!planet) return null;
 
     const data = {
-        name: "New Moon",
+        name: t('newMoon'),
         radius: 0.5,
         color: "#ffffff",
         material: moonMaterial,
@@ -201,8 +207,8 @@ function addMoon(planet) {
         orbitalSpeed: 0.5,
         rotationSpeed: 0.5,
         axialTilt: 0,
-        funFact: "Custom moon.",
-        yearLength: "—"
+        funFact: t('customMoonFact'),
+        yearLength: "-"
     };
 
     const moon = planet.addMoon(data);

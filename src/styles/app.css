@@ -56,6 +56,37 @@ canvas {
   pointer-events: auto;
 }
 
+.app-language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 44px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(6, 9, 22, 0.74);
+  backdrop-filter: blur(12px);
+}
+
+.app-language-switch button {
+  min-width: 33px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.app-language-switch button[aria-pressed="true"],
+.app-language-switch button:hover,
+.app-language-switch button:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+}
+
 .app-icon-button,
 .app-menu button,
 .app-menu input {
@@ -293,6 +324,18 @@ canvas {
     height: 38px;
     font-size: 17px;
     background: rgba(6, 9, 22, 0.68);
+  }
+
+  .app-language-switch {
+    height: 38px;
+    padding: 3px;
+    background: rgba(6, 9, 22, 0.68);
+  }
+
+  .app-language-switch button {
+    min-width: 28px;
+    height: 30px;
+    font-size: 10px;
   }
 
   .app-menu {

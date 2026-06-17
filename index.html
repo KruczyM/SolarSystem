@@ -26,6 +26,7 @@
 
   <div class="app-ui" aria-label="Application controls">
     <div class="app-floating-actions">
+      <div id="languageSwitch" class="app-language-switch" role="group" aria-label="Language"></div>
       <button id="muteButton" class="app-icon-button" type="button" aria-label="Toggle sound">🔇</button>
       <button
         id="menuToggle"
@@ -54,17 +55,17 @@
       </div>
 
       <div class="app-menu__section">
-        <p class="app-menu__section-title">Global settings</p>
+        <p class="app-menu__section-title" data-i18n="global-settings">Global settings</p>
         <div id="globalControls"></div>
       </div>
 
       <div class="app-menu__section">
-        <p class="app-menu__section-title">Focus planet</p>
+        <p class="app-menu__section-title" data-i18n="focus-planet">Focus planet</p>
         <div id="planetQuickActions" class="planet-actions"></div>
       </div>
 
       <div class="app-menu__section">
-        <p class="app-menu__section-title">Planet editor</p>
+        <p class="app-menu__section-title" data-i18n="planet-editor">Planet editor</p>
         <div id="planetEditor" class="planet-editor"></div>
       </div>
     </nav>
@@ -73,9 +74,9 @@
   <script type="module" src="/src/solar-system.js"></script>
 
   <footer class="music-credit">
-    Music: "Ex Machina" by Scott Buckley
+    <span data-i18n="music-credit">Music: "Ex Machina" by Scott Buckley</span>
     (<a href="https://www.scottbuckley.com.au" target="_blank" rel="noreferrer">scottbuckley.com.au</a>)
-    Licensed under
+    <span data-i18n="licensed-under">Licensed under</span>
     <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
   </footer>
 </body>

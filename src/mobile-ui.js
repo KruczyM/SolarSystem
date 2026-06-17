@@ -1,3 +1,5 @@
+import { getLanguage, getLanguages, setLanguage, t } from './i18n.js';
+
 export function createAppUi({
     camera,
     controls,
@@ -15,12 +17,51 @@ export function createAppUi({
     const planetEditor = document.querySelector('#planetEditor');
     const globalControls = document.querySelector('#globalControls');
     const toggleLabelsButton = document.querySelector('#toggleLabelsButton');
+    const languageSwitch = document.querySelector('#languageSwitch');
 
-    if (!root || !menuToggle || !menu || !backdrop || !planetQuickActions || !planetEditor || !globalControls || !toggleLabelsButton) {
+    if (!root || !menuToggle || !menu || !backdrop || !planetQuickActions || !planetEditor || !globalControls || !toggleLabelsButton || !languageSwitch) {
         throw new Error('App UI markup is missing. Check index.html.');
     }
 
     let labelsVisible = true;
+
+    applyStaticLabels();
+
+    function applyStaticLabels() {
+        document.querySelector('.app-menu__header strong').textContent = t('controls');
+        root.setAttribute('aria-label', t('appControls'));
+        document.querySelector('#muteButton')?.setAttribute('aria-label', t('toggleSound'));
+        document.querySelector('[data-action="reset-view"]').textContent = t('resetView');
+        document.querySelector('[data-action="add-planet"]').textContent = t('addPlanet');
+        document.querySelector('[data-action="close"]').setAttribute('aria-label', t('closeMenu'));
+        menuToggle.setAttribute('aria-label', t('openMenu'));
+        toggleLabelsButton.textContent = t('hideLabels');
+        document.querySelector('[data-i18n="global-settings"]').textContent = t('globalSettings');
+        document.querySelector('[data-i18n="focus-planet"]').textContent = t('focusPlanet');
+        document.querySelector('[data-i18n="planet-editor"]').textContent = t('planetEditor');
+        document.querySelector('[data-i18n="music-credit"]').textContent = t('musicCredit');
+        document.querySelector('[data-i18n="licensed-under"]').textContent = t('licensedUnder');
+        renderLanguageSwitch();
+    }
+
+    function renderLanguageSwitch() {
+        languageSwitch.setAttribute('aria-label', t('languageSelector'));
+        languageSwitch.replaceChildren(...getLanguages().map(language => {
+            const button = createElement('button', {
+                text: language.toUpperCase(),
+                attributes: {
+                    type: 'button',
+                    'aria-pressed': String(language === getLanguage())
+                },
+                dataset: {
+                    language
+                }
+            });
+
+            button.addEventListener('click', () => setLanguage(language));
+            return button;
+        }));
+    }
 
     function openMenu() {
         menu.classList.add('is-open');
@@ -64,7 +105,7 @@ export function createAppUi({
             });
         });
 
-        toggleLabelsButton.textContent = labelsVisible ? 'Hide labels' : 'Show labels';
+        toggleLabelsButton.textContent = labelsVisible ? t('hideLabels') : t('showLabels');
     }
 
     function focusPlanet(planet) {
@@ -163,7 +204,7 @@ export function createAppUi({
     function renderGlobalControls() {
         replaceChildren(globalControls, [
             createRangeControl({
-                label: 'Global size',
+                label: t('globalSize'),
                 value: settings.sizeMultiplier,
                 min: 0.5,
                 max: 10,
@@ -171,7 +212,7 @@ export function createAppUi({
                 control: 'global-size'
             }),
             createRangeControl({
-                label: 'Orbit speed',
+                label: t('orbitSpeed'),
                 value: settings.orbitSpeedMultiplier,
                 min: 0,
                 max: 1000,
@@ -179,7 +220,7 @@ export function createAppUi({
                 control: 'global-orbit-speed'
             }),
             createRangeControl({
-                label: 'Rotation speed',
+                label: t('rotationSpeed'),
                 value: settings.rotationSpeedMultiplier,
                 min: 0,
                 max: 1,
@@ -218,13 +259,13 @@ export function createAppUi({
         const content = createElement('div', { className: 'editor-card__content' });
 
         content.append(
-            createTextControl({ label: 'Name', value: planet.name, control: 'planet-name', planetIndex }),
-            createRangeControl({ label: 'Radius', value: planet.radius, min: 0, max: 10, step: 0.1, control: 'planet-radius', planetIndex })
+            createTextControl({ label: t('name'), value: planet.name, control: 'planet-name', planetIndex }),
+            createRangeControl({ label: t('radius'), value: planet.radius, min: 0, max: 10, step: 0.1, control: 'planet-radius', planetIndex })
         );
 
         if (!planet.isSun) {
             content.append(createRangeControl({
-                label: 'Orbital radius',
+                label: t('orbitalRadius'),
                 value: planet.orbitalRadius,
                 min: 0,
                 max: 200,
@@ -235,15 +276,15 @@ export function createAppUi({
         }
 
         content.append(
-            createColorControl({ label: 'Color', value: planet.color || '#ffffff', control: 'planet-color', planetIndex }),
-            createRangeControl({ label: 'Orbit speed', value: planet.orbitalSpeed, min: 0, max: 5, step: 0.001, control: 'planet-orbit-speed', planetIndex }),
-            createRangeControl({ label: 'Rotation speed', value: planet.rotationSpeed, min: -10, max: 10, step: 0.01, control: 'planet-rotation-speed', planetIndex }),
-            createRangeControl({ label: 'Axial tilt', value: planet.mesh.rotation.z, min: -Math.PI, max: Math.PI, step: 0.01, control: 'planet-axial-tilt', planetIndex })
+            createColorControl({ label: t('color'), value: planet.color || '#ffffff', control: 'planet-color', planetIndex }),
+            createRangeControl({ label: t('orbitSpeed'), value: planet.orbitalSpeed, min: 0, max: 5, step: 0.001, control: 'planet-orbit-speed', planetIndex }),
+            createRangeControl({ label: t('rotationSpeed'), value: planet.rotationSpeed, min: -10, max: 10, step: 0.01, control: 'planet-rotation-speed', planetIndex }),
+            createRangeControl({ label: t('axialTilt'), value: planet.mesh.rotation.z, min: -Math.PI, max: Math.PI, step: 0.01, control: 'planet-axial-tilt', planetIndex })
         );
 
         if (!planet.isSun) {
             content.append(createElement('button', {
-                text: '➕ Add moon',
+                text: t('addMoon'),
                 attributes: { type: 'button' },
                 dataset: {
                     action: 'add-moon',
@@ -253,7 +294,7 @@ export function createAppUi({
         }
 
         content.append(createElement('button', {
-            text: planet.isSun ? '❌ Remove Sun' : '❌ Remove planet',
+            text: planet.isSun ? t('removeSun') : t('removePlanet'),
             attributes: { type: 'button' },
             dataset: {
                 action: 'remove-planet',
@@ -271,19 +312,19 @@ export function createAppUi({
 
     function createMoonCard(moon, planetIndex, moonIndex) {
         const details = createElement('details', { className: 'editor-card editor-card--moon' });
-        details.append(createElement('summary', { text: moon.name || `Moon ${moonIndex + 1}` }));
+        details.append(createElement('summary', { text: moon.name || `${t('newMoon')} ${moonIndex + 1}` }));
 
         const content = createElement('div', { className: 'editor-card__content' });
 
         content.append(
-            createTextControl({ label: 'Name', value: moon.name || '', control: 'moon-name', planetIndex, moonIndex }),
-            createRangeControl({ label: 'Radius', value: moon.radius, min: 0.1, max: 2, step: 0.1, control: 'moon-radius', planetIndex, moonIndex }),
-            createRangeControl({ label: 'Orbital radius', value: moon.orbitalRadius, min: 0.1, max: 20, step: 0.1, control: 'moon-orbital-radius', planetIndex, moonIndex }),
-            createRangeControl({ label: 'Orbit speed', value: moon.orbitalSpeed, min: 0, max: 5, step: 0.001, control: 'moon-orbit-speed', planetIndex, moonIndex }),
-            createRangeControl({ label: 'Rotation speed', value: moon.rotationSpeed, min: 0, max: 5, step: 0.001, control: 'moon-rotation-speed', planetIndex, moonIndex }),
-            createRangeControl({ label: 'Axial tilt', value: moon.mesh.rotation.z, min: -Math.PI, max: Math.PI, step: 0.01, control: 'moon-axial-tilt', planetIndex, moonIndex }),
+            createTextControl({ label: t('name'), value: moon.name || '', control: 'moon-name', planetIndex, moonIndex }),
+            createRangeControl({ label: t('radius'), value: moon.radius, min: 0.1, max: 2, step: 0.1, control: 'moon-radius', planetIndex, moonIndex }),
+            createRangeControl({ label: t('orbitalRadius'), value: moon.orbitalRadius, min: 0.1, max: 20, step: 0.1, control: 'moon-orbital-radius', planetIndex, moonIndex }),
+            createRangeControl({ label: t('orbitSpeed'), value: moon.orbitalSpeed, min: 0, max: 5, step: 0.001, control: 'moon-orbit-speed', planetIndex, moonIndex }),
+            createRangeControl({ label: t('rotationSpeed'), value: moon.rotationSpeed, min: 0, max: 5, step: 0.001, control: 'moon-rotation-speed', planetIndex, moonIndex }),
+            createRangeControl({ label: t('axialTilt'), value: moon.mesh.rotation.z, min: -Math.PI, max: Math.PI, step: 0.01, control: 'moon-axial-tilt', planetIndex, moonIndex }),
             createElement('button', {
-                text: '❌ Remove moon',
+                text: t('removeMoon'),
                 attributes: { type: 'button' },
                 dataset: {
                     action: 'remove-moon',
@@ -301,6 +342,22 @@ export function createAppUi({
         renderGlobalControls();
         renderPlanetButtons();
         renderPlanetEditor();
+        translateActionButtons();
+    }
+
+    function translateActionButtons() {
+        menu.querySelectorAll('[data-action="add-moon"]').forEach(button => {
+            button.textContent = t('addMoon');
+        });
+
+        menu.querySelectorAll('[data-action="remove-planet"]').forEach(button => {
+            const planet = planets[Number(button.dataset.planetIndex)];
+            button.textContent = planet?.isSun ? t('removeSun') : t('removePlanet');
+        });
+
+        menu.querySelectorAll('[data-action="remove-moon"]').forEach(button => {
+            button.textContent = t('removeMoon');
+        });
     }
 
     function updateOutput(input) {
