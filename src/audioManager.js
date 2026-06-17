@@ -15,8 +15,7 @@ export function setupAudio(camera, audioPath) {
     function updateMuteButton() {
         if (!muteButton) return;
 
-        muteButton.textContent = sound.isPlaying ? t('soundOnShort') : t('soundOffShort');
-        muteButton.textContent = sound.isPlaying ? t('soundOnShort') : t('soundOffShort');
+        muteButton.textContent = sound.isPlaying ? "\uD83D\uDD0A" : "\uD83D\uDD07";
         muteButton.setAttribute('aria-label', sound.isPlaying ? t('soundOn') : t('soundOff'));
     }
 
