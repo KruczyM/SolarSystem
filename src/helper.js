@@ -143,7 +143,6 @@ export function initClicks(renderer, camera, controls, planets) {
 
         const planet = hit.userData.planetRef;
         if (!planet) return;
-        console.log(planets);
         focusCameraOnPlanet(camera, controls, planet);
     });
 }

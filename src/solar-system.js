@@ -15,7 +15,7 @@ import { getLanguage, t, translateBodies } from './i18n.js';
 document.documentElement.lang = getLanguage();
 document.title = t('title');
 
-const globalFont = await loadFont("./assets/fonts/helvetiker_bold.typeface.json");
+const globalFont = await loadFont("./assets/fonts/noto_sans_regular.typeface.json");
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(

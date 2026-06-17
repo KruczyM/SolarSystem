@@ -216,7 +216,9 @@ export class Planet {
         const line = new THREE.LineLoop(geometry, material);
         return line;
     }
+
     createLabel(font) {
+
         const geometry = new TextGeometry(this.name, {
             font: font,
             size: Math.max(this.radius / 3, 0.7),

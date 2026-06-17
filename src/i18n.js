@@ -88,7 +88,7 @@ const translations = {
         musicCredit: "Muzyka: \"Ex Machina\" autorstwa Scotta Buckleya",
         licensedUnder: "Licencja",
         planets: {
-            Sun: { name: "S\u0142o\u0144ce", funFact: "S\u0142o\u0144ce zawiera 99,86% masy uk\u0142adu s\u0142onecznego.", yearLength: "-" },
+            Sun: { name: "S\u0142ońce", funFact: "S\u0142o\u0144ce zawiera 99,86% masy uk\u0142adu s\u0142onecznego.", yearLength: "-" },
             Mercury: { name: "Merkury", funFact: "Merkury ma najwi\u0119ksz\u0105 r\u00f3\u017cnic\u0119 temperatur w uk\u0142adzie s\u0142onecznym.", yearLength: "88 dni" },
             Venus: { name: "Wenus", funFact: "Wenus obraca si\u0119 w przeciwnym kierunku ni\u017c wi\u0119kszo\u015b\u0107 planet.", yearLength: "225 dni" },
             Earth: { name: "Ziemia", funFact: "Ziemia jest jedyn\u0105 znan\u0105 planet\u0105 z \u017cyciem.", yearLength: "365 dni" },
@@ -97,7 +97,7 @@ const translations = {
             Saturn: { name: "Saturn", funFact: "Saturn jest tak lekki, \u017ce m\u00f3g\u0142by unosi\u0107 si\u0119 na wodzie.", yearLength: "29,5 roku" },
             Uranus: { name: "Uran", funFact: "Uran obraca si\u0119 na boku.", yearLength: "84 lata" },
             Neptune: { name: "Neptun", funFact: "Neptun ma najszybsze wiatry w uk\u0142adzie s\u0142onecznym.", yearLength: "165 lat" },
-            Moon: { name: "Ksi\u0119\u017cyc", funFact: "Ksi\u0119\u017cyc zawsze pokazuje Ziemi t\u0119 sam\u0105 stron\u0119.", yearLength: "27 dni" }
+            Moon: { name: "Księżyc", funFact: "Ksi\u0119\u017cyc zawsze pokazuje Ziemi t\u0119 sam\u0105 stron\u0119.", yearLength: "27 dni" }
         }
     },
     fi: {
